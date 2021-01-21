@@ -1,0 +1,31 @@
+### get test
+GET http://localhost:8080/test?name=gy&age=20
+Accept: application/json
+Content-Type: application/json
+Agent: unknown
+
+{
+  "name": "gy",
+  "age": 21
+}
+
+
+### file upload
+POST http://localhost:8080/file/upload
+Content-Type: multipart/form-data; boundary=WebAppBoundary
+
+--WebAppBoundary
+Content-Disposition: form-data; name="name"
+Content-Type: text/plain
+
+guo yang
+--WebAppBoundary
+Content-Disposition: form-data; name="files"; filename="test.xlsx"
+
+< E:\Temp\Documents\test.xlsx
+--WebAppBoundary
+Content-Disposition: form-data; name="age"
+Content-Type: text/plain
+
+21
+--WebAppBoundary--
