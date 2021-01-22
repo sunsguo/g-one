@@ -70,7 +70,7 @@ public class HttpServer {
 
                     outputStream.flush();
                 } catch (BadRequest e) {
-                    log.warning("bad request " + e.getMessage());
+                    log.warning("bad request: " + e.getMsg());
                     client.close();
                     break;
                 }

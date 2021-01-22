@@ -8,4 +8,7 @@ public class BadRequest extends RuntimeException {
         this.msg = msg;
     }
 
+    public String getMsg() {
+        return msg;
+    }
 }

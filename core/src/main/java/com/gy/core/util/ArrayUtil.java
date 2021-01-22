@@ -12,7 +12,7 @@ public abstract class ArrayUtil {
      * @param start  开始查找位置
      * @param end    结束查找位置
      * @param target 目标数组
-     * @return
+     * @return 如果没找到返回负数，如果结尾能匹配上返回相应的负数
      */
     public static int indexOf(byte[] buffer, int start, int end, byte[] target) {
         if (buffer == null) return -2;

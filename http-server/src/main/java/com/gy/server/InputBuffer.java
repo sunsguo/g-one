@@ -5,6 +5,7 @@ import com.gy.core.util.StopWatch;
 import com.gy.core.util.StringUtil;
 import com.gy.server.exception.BadRequest;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -28,7 +29,7 @@ public class InputBuffer {
     /**
      * 默认缓冲区大小
      */
-    private static final int DEFAULT_BUFFER_SIZE = 1024 * 4;
+    private static final int DEFAULT_BUFFER_SIZE = 1024;
 
     private static final byte[] DELIMITER = Constants.CRLF.getBytes(StandardCharsets.UTF_8);
 
@@ -145,14 +146,9 @@ public class InputBuffer {
         if (!isMultipart(contentType)) {
             int remaining = remaining();
 
-            System.out.println(String.format("parse body: length %s  remaining %s", length, remaining));
-
             if (remaining < length) fill();
 
             String requestBody = new String(buffer, position, length);
-
-            System.out.println(requestBody);
-
 
             position += length;
             request.setBody(requestBody);
@@ -206,22 +202,39 @@ public class InputBuffer {
 
             // 文件参数
             try {
-                FileOutputStream fileOutputStream = new FileOutputStream("./" + fileName);
+                String tmp = System.getenv("java.io.tmpdir");
+                FileOutputStream fileOutputStream = new FileOutputStream(tmp + File.separator + fileName);
 
                 byte[] dividerBytes = ("\r\n" + divider).getBytes(StandardCharsets.UTF_8);
 
                 while (true) {
                     int index = indexOf(buffer, position, limit, dividerBytes);
-                    if (index < 0) {
-                        fileOutputStream.write(buffer, position, remaining());
 
+                    if (index < 0) {
+                        int curLimit = limit;
+
+                        // 处理分隔符被读断
+                        if (index > Integer.MIN_VALUE) {
+                            limit = -index;
+                        }
+
+                        fileOutputStream.write(buffer, position, remaining());
                         position = limit;
+
+                        // 将剩余的数据移动到行首
+                        if (curLimit > limit) {
+                            limit = curLimit;
+                            System.arraycopy(buffer, position, buffer, 0, remaining());
+                            limit = remaining();
+                            position = 0;
+                        }
+
                         fill();
                         continue;
                     }
 
                     fileOutputStream.write(buffer, position, index - position);
-                    position += index + DELIMITER.length;
+                    position = index + DELIMITER.length;
                     break;
                 }
             } catch (IOException e) {
@@ -276,7 +289,9 @@ public class InputBuffer {
                 limit = remaining();
                 position = 0;
 
-                // shouldSkip = limit - DELIMITER.length;
+                if (limit > DELIMITER.length)
+                    shouldSkip = limit - DELIMITER.length;
+
             }
 
             needRead = true;
