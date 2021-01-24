@@ -4,6 +4,7 @@ import com.gy.core.util.LogFactory;
 import com.gy.core.util.StreamUtil;
 import com.gy.server.exception.BadRequest;
 
+import javax.servlet.RequestDispatcher;
 import java.io.*;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
@@ -23,6 +24,8 @@ public class HttpServer {
     public HttpServer(int port) {
         this.port = port;
     }
+
+    private RequestHandler handler;
 
     public void start() {
         try {
@@ -54,21 +57,12 @@ public class HttpServer {
             while (true) {
                 try {
                     Request request = inputBuffer.getRequest();
+                    Response response = new Response(outputStream);
 
-                    String path = request.getPath();
+                    RequestHandler handler = getHandler();
+                    handler.handle(request, response);
 
-                    // 响应最后不需要添加换行符 上传文件时最后是有换行符的
-                    if (path.endsWith("ico")) {
-                        File file = new File("E:\\Pictures\\Elementary OS background\\img0.jpg");
-                        FileInputStream img = new FileInputStream(file);
-
-                        outputStream.write(("HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: " + file.length() + "\r\n\r\n").getBytes(StandardCharsets.UTF_8));
-                        StreamUtil.copy(img, outputStream);
-                    } else {
-                        outputStream.write(("HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: " + path.getBytes(StandardCharsets.UTF_8).length + "\r\n\r\n" + path).getBytes(StandardCharsets.UTF_8));
-                    }
-
-                    outputStream.flush();
+                    response.flush();
                 } catch (BadRequest e) {
                     log.warning("bad request: " + e.getMsg());
                     client.close();
@@ -81,5 +75,16 @@ public class HttpServer {
 
     }
 
+    private RequestHandler getHandler() {
+        if (handler == null) {
+            handler = new DefaultHandler();
+        }
+
+        return handler;
+    }
+
+    public void setHandler(RequestHandler handler) {
+        this.handler = handler;
+    }
 
 }

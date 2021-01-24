@@ -31,6 +31,16 @@ public class Headers {
         add(split[0], split.length > 1 ? split[1].trim() : "");
     }
 
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+
+        this.headers.forEach(it -> {
+            sb.append(it.getName()).append(": ").append(it.getValue()).append("\r\n");
+        });
+
+        return sb.toString();
+    }
 
     /**
      * 单行请求头

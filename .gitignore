@@ -4,6 +4,8 @@
 **/build/
 !src/**/build/
 
+
+
 # Ignore Gradle GUI config
 gradle-app.setting
 
@@ -18,3 +20,5 @@ gradle-app.setting
 
 ### IDEA
 .idea
+
+**/out
