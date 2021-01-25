@@ -1,7 +1,9 @@
 package com.gy.server;
 
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * 请求头
@@ -40,6 +42,41 @@ public class Headers {
         });
 
         return sb.toString();
+    }
+
+    public Enumeration<String> getHeaders(String s) {
+        List<Header> list = this.headers.stream().filter(header -> s.equalsIgnoreCase(header.getName()))
+                .collect(Collectors.toList());
+
+        return new Enumeration<String>() {
+            private int index = 0;
+
+            @Override
+            public boolean hasMoreElements() {
+                return index < list.size();
+            }
+
+            @Override
+            public String nextElement() {
+                return list.get(index++).getValue();
+            }
+        };
+    }
+
+    public Enumeration<String> getHeaderNames() {
+        return new Enumeration<String>() {
+            private int index = 0;
+
+            @Override
+            public boolean hasMoreElements() {
+                return index < headers.size();
+            }
+
+            @Override
+            public String nextElement() {
+                return headers.get(index++).getName();
+            }
+        };
     }
 
     /**

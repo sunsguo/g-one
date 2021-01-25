@@ -3,4 +3,5 @@ include 'http-server'
 include 'web-mvc'
 include 'core'
 include 'demo'
+include 'servlet'
 

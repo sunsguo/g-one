@@ -25,6 +25,7 @@ public class Response {
         write(content.getBytes(StandardCharsets.UTF_8));
     }
 
+    // todo: 此处可以优化 如果 buffer 太大可以改为 transfer-encoding chunked 传输
     public void write(byte[] bytes) {
         try {
             buffer.write(bytes);

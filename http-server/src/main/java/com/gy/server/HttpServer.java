@@ -59,6 +59,8 @@ public class HttpServer {
                     Request request = inputBuffer.getRequest();
                     Response response = new Response(outputStream);
 
+                    log.info(request.getHeaders().toString());
+
                     RequestHandler handler = getHandler();
                     handler.handle(request, response);
 

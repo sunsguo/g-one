@@ -135,6 +135,8 @@ public class InputBuffer {
 
     /**
      * 解析请求体
+     *
+     * todo: 还没有实现 transfer-encoding 传输方式
      */
     private void parseBody() {
         String contentLength = request.getHeader("Content-Length");
