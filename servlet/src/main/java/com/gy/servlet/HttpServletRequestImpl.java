@@ -15,7 +15,15 @@ import java.util.*;
 
 public class HttpServletRequestImpl implements HttpServletRequest {
 
-    Request request;
+    /**
+     * 容器
+     */
+    private Container container;
+
+    /**
+     * 原生 http 请求
+     */
+    private Request request;
 
     private Cookie[] cookies;
 
@@ -129,32 +137,69 @@ public class HttpServletRequestImpl implements HttpServletRequest {
 
     @Override
     public String getRequestedSessionId() {
+        for (Cookie cookie : cookies) {
+            if (Constants.SESSION_ID.equalsIgnoreCase(cookie.getName())) {
+                return cookie.getValue();
+            }
+        }
         return null;
     }
 
     @Override
     public String getRequestURI() {
-        return null;
+        return request.getPath();
     }
 
     @Override
     public StringBuffer getRequestURL() {
-        return null;
+        StringBuffer sb = new StringBuffer();
+        return sb.append("http://")
+                .append(request.getHost())
+                .append(":")
+                .append(request.getPort())
+                .append(request.getPath());
     }
 
     @Override
     public String getServletPath() {
-        return null;
+        throw new UnsupportedOperationException();
+
     }
 
     @Override
     public HttpSession getSession(boolean b) {
-        return null;
+        String path = request.getPath();
+        int index = path.indexOf("/", 1);
+
+        String contentPath = "";
+
+        if (index > 0) contentPath = path.substring(1, index);
+
+
+        ApplicationContext context = container.findContext(contentPath);
+
+        if (context == null) throw new RuntimeException("not found");
+
+        HttpSession session = context.getSession(getRequestedSessionId());
+
+        if (session == null && b) {
+            session = new HttpSessionImpl();
+
+            String sessionId = UUID.randomUUID().toString();
+            context.addSession(sessionId, session);
+        }
+
+        return session;
     }
 
+    /**
+     * 获取 session 没有则创建一个
+     *
+     * @return
+     */
     @Override
     public HttpSession getSession() {
-        return null;
+        return getSession(true);
     }
 
     @Override

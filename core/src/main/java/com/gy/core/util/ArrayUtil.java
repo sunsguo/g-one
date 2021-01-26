@@ -1,5 +1,10 @@
 package com.gy.core.util;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Enumeration;
+import java.util.List;
+
 /**
  * 数组工具类
  */
@@ -34,6 +39,17 @@ public abstract class ArrayUtil {
         }
 
         return Integer.MIN_VALUE;
+    }
+
+    public static <T> Collection<T> enumerationToCollection(Enumeration<T> enumeration) {
+        List<T> list = new ArrayList<>();
+
+        while (enumeration.hasMoreElements()) {
+            T header = enumeration.nextElement();
+            list.add(header);
+        }
+
+        return  list;
     }
 
 }

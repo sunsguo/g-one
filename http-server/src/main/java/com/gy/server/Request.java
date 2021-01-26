@@ -133,4 +133,12 @@ public class Request {
     public Parameters parameters() {
         return parameters;
     }
+
+    public Integer getPort() {
+        return port;
+    }
+
+    public String getHost() {
+        return host;
+    }
 }

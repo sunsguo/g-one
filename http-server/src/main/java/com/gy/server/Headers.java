@@ -13,11 +13,11 @@ public class Headers {
     private List<Header> headers = new ArrayList<Header>(8);
 
     public String get(String name) {
-        for (Header header : headers) {
-            if (header.name.equalsIgnoreCase(name)) return header.value;
-        }
+        Header header = getHeader(name);
 
-        return null;
+        if (header == null) return null;
+
+        return header.getValue();
     }
 
     public void add(String name, String value) {
@@ -77,6 +77,24 @@ public class Headers {
                 return headers.get(index++).getName();
             }
         };
+    }
+
+    public Header getHeader(String name) {
+        for (Header header : headers) {
+            if (header.name.equalsIgnoreCase(name)) return header;
+        }
+
+        return null;
+    }
+
+    public void set(String name, String value) {
+        Header header = getHeader(name);
+        if (header != null) {
+            header.setValue(value);
+            return;
+        }
+
+        add(name, value);
     }
 
     /**

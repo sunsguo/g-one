@@ -75,4 +75,9 @@ public class GenericResolverTest {
         assertEquals(String.class, genericResolver.getGenericType(t2));
     }
 
+    @Test
+    void getGenericType3() {
+        new K<Integer, String, Long>().test(1, "", 1L);
+    }
+
 }
