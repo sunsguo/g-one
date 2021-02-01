@@ -9,14 +9,16 @@ import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
-@WebServlet("/hello")
-public class HelloServlet extends HttpServlet {
+@WebServlet("/world")
+public class WorldServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         HttpSession session = request.getSession();
-        session.setAttribute("name", "gy");
-        response.getOutputStream().write("hello world".getBytes(StandardCharsets.UTF_8));
+
+        Object name = session.getAttribute("name");
+
+        response.getOutputStream().write(name.toString().getBytes(StandardCharsets.UTF_8));
     }
 
 }

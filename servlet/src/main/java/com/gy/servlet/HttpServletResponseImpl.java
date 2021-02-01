@@ -5,17 +5,20 @@ import com.gy.server.HttpStatus;
 import com.gy.server.Response;
 
 import javax.servlet.ServletOutputStream;
+import javax.servlet.WriteListener;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class HttpServletResponseImpl implements HttpServletResponse {
 
     private Response response;
 
-    private List<Cookie> cookies;
+    private List<Cookie> cookies = new ArrayList<>();
 
     public HttpServletResponseImpl(Response response) {
         this.response = response;
@@ -24,6 +27,8 @@ public class HttpServletResponseImpl implements HttpServletResponse {
     @Override
     public void addCookie(Cookie cookie) {
         cookies.add(cookie);
+
+        response.setHeader("Set-Cookie", cookie.getName() + "=" + cookie.getValue());
     }
 
     @Override
@@ -142,7 +147,24 @@ public class HttpServletResponseImpl implements HttpServletResponse {
 
     @Override
     public ServletOutputStream getOutputStream() throws IOException {
-        throw new UnsupportedOperationException();
+        OutputStream outputStream = response.getOutputStream();
+
+        return new ServletOutputStream() {
+            @Override
+            public boolean isReady() {
+                return true;
+            }
+
+            @Override
+            public void setWriteListener(WriteListener writeListener) {
+                throw new UnsupportedOperationException();
+            }
+
+            @Override
+            public void write(int b) throws IOException {
+                outputStream.write(b);
+            }
+        };
     }
 
     @Override

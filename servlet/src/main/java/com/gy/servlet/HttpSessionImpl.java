@@ -4,8 +4,12 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpSessionContext;
 import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Map;
 
 public class HttpSessionImpl implements HttpSession {
+
+    private Map<String, Object> attrs = new HashMap<>();
 
     @Override
     public long getCreationTime() {
@@ -44,7 +48,7 @@ public class HttpSessionImpl implements HttpSession {
 
     @Override
     public Object getAttribute(String name) {
-        return null;
+        return attrs.get(name);
     }
 
     @Override
@@ -64,7 +68,7 @@ public class HttpSessionImpl implements HttpSession {
 
     @Override
     public void setAttribute(String name, Object value) {
-
+        attrs.put(name, value);
     }
 
     @Override

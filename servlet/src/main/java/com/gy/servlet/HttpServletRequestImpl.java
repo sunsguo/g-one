@@ -4,6 +4,7 @@ package com.gy.servlet;
 import com.gy.core.util.StringUtil;
 import com.gy.server.Headers;
 import com.gy.server.Request;
+import com.gy.server.Response;
 
 import javax.servlet.*;
 import javax.servlet.http.*;
@@ -25,10 +26,15 @@ public class HttpServletRequestImpl implements HttpServletRequest {
      */
     private Request request;
 
+    private Response response;
+
+    private HttpServletResponse servletResponse;
+
     private Cookie[] cookies;
 
-    public HttpServletRequestImpl(Request request) {
+    public HttpServletRequestImpl(Request request, HttpServletResponse servletResponse) {
         this.request = request;
+        this.servletResponse = servletResponse;
 
         init();
     }
@@ -40,7 +46,7 @@ public class HttpServletRequestImpl implements HttpServletRequest {
     private void initCookie() {
         String cookieStr = request.getHeader("Cookie");
 
-        if (StringUtil.isEmpty(cookies)) {
+        if (StringUtil.isEmpty(cookieStr)) {
             cookies = new Cookie[0];
             return;
         }
@@ -173,7 +179,7 @@ public class HttpServletRequestImpl implements HttpServletRequest {
 
         String contentPath = "";
 
-        if (index > 0) contentPath = path.substring(1, index);
+        if (index > 0) contentPath = path.substring(0, index);
 
 
         ApplicationContext context = container.findContext(contentPath);
@@ -187,6 +193,9 @@ public class HttpServletRequestImpl implements HttpServletRequest {
 
             String sessionId = UUID.randomUUID().toString();
             context.addSession(sessionId, session);
+
+            Cookie cookie = new Cookie(Constants.SESSION_ID, sessionId);
+            servletResponse.addCookie(cookie);
         }
 
         return session;
@@ -440,5 +449,9 @@ public class HttpServletRequestImpl implements HttpServletRequest {
     @Override
     public DispatcherType getDispatcherType() {
         return null;
+    }
+
+    public void setContainer(Container container) {
+        this.container = container;
     }
 }

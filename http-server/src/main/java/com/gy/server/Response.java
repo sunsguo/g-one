@@ -42,12 +42,15 @@ public class Response {
 
     // todo: 此处可以优化 如果 buffer 太大可以改为 transfer-encoding chunked 传输
     public void write(byte[] bytes) {
-        byteBuffer.put(bytes, 0, bytes.length);
+        write(bytes, 0, bytes.length);
     }
 
     public void write(byte[] bytes, int offset, int length) {
-        initBufferIfNeeded();
-        byteBuffer.put(bytes, offset, length);
+        try {
+            getOutputStream().write(bytes, offset, length);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private void initBufferIfNeeded() {
@@ -59,12 +62,14 @@ public class Response {
     public void flush() {
         if (flushed) return;
 
-        this.headers.add("Content-Length", buffer.size() + "");
+        byteBuffer.flip();
+        int remaining = byteBuffer.remaining();
+
+        this.headers.add("Content-Length", remaining + "");
+
         try {
             writeHead();
 
-            byteBuffer.flip();
-            int remaining = byteBuffer.remaining();
             byte[] data = new byte[remaining];
             byteBuffer.get(data);
 
@@ -95,7 +100,7 @@ public class Response {
     }
 
     public void sendError(int sc, String msg) {
-       setStatus(sc, msg);
+        setStatus(sc, msg);
         write("");
     }
 
@@ -122,7 +127,14 @@ public class Response {
     }
 
     public OutputStream getOutputStream() {
-        return outputStream;
+        initBufferIfNeeded();
+
+        return new OutputStream() {
+            @Override
+            public void write(int b) throws IOException {
+                byteBuffer.put((byte) b);
+            }
+        };
     }
 
     public void setBufferSize(int size) {

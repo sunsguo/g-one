@@ -2,6 +2,7 @@ package com.gy.servlet;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -12,7 +13,7 @@ public class Container {
     /**
      * 一个容器有多个应用
      */
-    private List<ApplicationContext> contexts;
+    private List<ApplicationContext> contexts = new ArrayList<>();
 
     /**
      * 启动一个容器

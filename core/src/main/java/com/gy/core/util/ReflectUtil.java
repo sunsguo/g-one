@@ -44,4 +44,12 @@ public abstract class ReflectUtil {
         return null;
     }
 
+    public static <T> T instance(Class<T> cls) {
+        try {
+            return cls.newInstance();
+        } catch (InstantiationException | IllegalAccessException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 }

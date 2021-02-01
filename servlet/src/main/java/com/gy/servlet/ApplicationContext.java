@@ -1,6 +1,5 @@
 package com.gy.servlet;
 
-import javax.servlet.Servlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -13,7 +12,7 @@ import java.util.Map;
 public class ApplicationContext {
 
     /**
-     * 必须以斜线开头
+     * 必须以斜线开头，不是斜线结尾
      */
     private String contextPath;
 
@@ -21,7 +20,7 @@ public class ApplicationContext {
         this.contextPath = contextPath;
     }
 
-    private Map<String, Servlet> servletMappings = new HashMap<>();
+    private Map<String, HttpServlet> servletMappings = new HashMap<>();
 
     private Map<String, HttpSession> sessionMap = new HashMap<>();
 
@@ -43,7 +42,8 @@ public class ApplicationContext {
 
     public HttpServlet findServlet(HttpServletRequest request) {
         String uri = request.getRequestURI();
+        uri = uri.substring(contextPath.length());
 
-        return null;
+        return servletMappings.get(uri);
     }
 }
