@@ -11,8 +11,6 @@ import javax.servlet.http.*;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.security.Principal;
 import java.util.*;
@@ -28,8 +26,6 @@ public class HttpServletRequestImpl implements HttpServletRequest {
      * 原生 http 请求
      */
     private Request request;
-
-    private Response response;
 
     private HttpServletResponse servletResponse;
 
