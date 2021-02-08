@@ -40,6 +40,18 @@ public class Container {
         return null;
     }
 
+    public ApplicationContext findContext(HttpServletRequest request) {
+        String uri = request.getRequestURI();
+
+        for (ApplicationContext context : contexts) {
+            if (uri.startsWith(context.getContextPath())) {
+                return context;
+            }
+        }
+
+        return null;
+    }
+
     public HttpServlet findServlet(HttpServletRequest request) {
         String uri = request.getRequestURI();
 
@@ -54,6 +66,22 @@ public class Container {
 
         if (applicationContext == null) return null;
 
-        return applicationContext.findServlet(request);
+        HttpServlet servlet = applicationContext.findServlet(request);
+
+        if (servlet == null) {
+            return findServlet(request.getContextPath(), "/");
+        }
+
+        return servlet;
     }
+
+    public HttpServlet findServlet(String contextPath, String path) {
+
+        ApplicationContext context = findContext(contextPath);
+
+        if (context == null) return null;
+
+        return context.findServlet(path);
+    }
+
 }

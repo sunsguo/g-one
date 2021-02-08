@@ -2,7 +2,10 @@ package com.gy.core.util;
 
 import org.junit.jupiter.api.Test;
 
+import java.io.IOException;
 import java.lang.reflect.Field;
+import java.net.URL;
+import java.util.Enumeration;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -40,6 +43,16 @@ class ReflectUtilTest {
         assertNull(b1);
         b1 = ReflectUtil.getDeclaredField(SuperClass.class, "p1");
         assertEquals(String.class, b1.getType());
+    }
+
+    @Test
+    void test() throws IOException {
+        Enumeration<URL> resources = ReflectUtilTest.class.getClassLoader().getResources(".");
+
+        while (resources.hasMoreElements()) {
+            System.out.println(resources.nextElement());
+        }
+
     }
 
 

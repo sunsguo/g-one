@@ -1,6 +1,9 @@
 package com.gy.server;
 
 import java.io.File;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -80,6 +83,12 @@ public class Parameters {
 
             String name = split[0];
             String value = split.length > 1 ? split[1] : "";
+
+            try {
+                value = URLDecoder.decode(value, "utf-8");
+            } catch (UnsupportedEncodingException e) {
+                // e.printStackTrace();
+            }
 
             if (parameters.containsKey(name)) {
                 parameters.get(name).add(value);

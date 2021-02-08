@@ -67,9 +67,16 @@ public class HttpServletResponseImpl implements HttpServletResponse {
         response.sendError(sc);
     }
 
+    /**
+     * 重定向是浏览器行为，在收到状态码为302的响应时，自动重发请求到 Location 响应头
+     * 此时浏览器地址栏的 url 会发生改变
+     *
+     * @param location
+     * @throws IOException
+     */
     @Override
     public void sendRedirect(String location) throws IOException {
-        throw new UnsupportedOperationException();
+        response.sendRedirect(location);
     }
 
     @Override
@@ -137,7 +144,7 @@ public class HttpServletResponseImpl implements HttpServletResponse {
 
     @Override
     public String getCharacterEncoding() {
-        throw new UnsupportedOperationException();
+        return "UTF-8";
     }
 
     @Override

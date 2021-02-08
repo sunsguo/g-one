@@ -13,7 +13,6 @@ import java.util.Arrays;
  */
 public class Bootstrap {
 
-
     public static void main(String[] args) {
         new Bootstrap().start();
     }
@@ -24,6 +23,9 @@ public class Bootstrap {
         ApplicationContext applicationContext = new ApplicationContext("/demo");
 
         container.addContext(applicationContext);
+
+        HttpServer httpServer = new HttpServer(8080);
+        httpServer.setHandler(new ServletHandler(container));
 
         FileUtil.walkClassFile("", cls -> {
             WebServlet webServlet = cls.getAnnotation(WebServlet.class);
@@ -38,8 +40,6 @@ public class Bootstrap {
             }
         });
 
-        HttpServer httpServer = new HttpServer(8080);
-        httpServer.setHandler(new ServletHandler(container));
 
         httpServer.start();
     }

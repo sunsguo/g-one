@@ -148,4 +148,10 @@ public class Response {
     public void resetBuffer() {
         byteBuffer.clear();
     }
+
+    public void sendRedirect(String location) {
+        setStatus(HttpStatus.FOUND.value());
+        addHeader("Location", location);
+        write("");
+    }
 }

@@ -11,6 +11,9 @@ import javax.servlet.http.*;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import java.security.Principal;
 import java.util.*;
 
@@ -31,6 +34,8 @@ public class HttpServletRequestImpl implements HttpServletRequest {
     private HttpServletResponse servletResponse;
 
     private Cookie[] cookies;
+
+    private HashMap<String, Object> attrs = new HashMap<>();
 
     public HttpServletRequestImpl(Request request, HttpServletResponse servletResponse) {
         this.request = request;
@@ -108,7 +113,7 @@ public class HttpServletRequestImpl implements HttpServletRequest {
 
     @Override
     public String getPathInfo() {
-        throw new UnsupportedOperationException();
+        return getRequestURI();
     }
 
     @Override
@@ -118,7 +123,11 @@ public class HttpServletRequestImpl implements HttpServletRequest {
 
     @Override
     public String getContextPath() {
-        throw new UnsupportedOperationException();
+        ApplicationContext context = container.findContext(this);
+
+        if (context == null)
+            return "";
+        return context.getContextPath();
     }
 
     @Override
@@ -138,7 +147,7 @@ public class HttpServletRequestImpl implements HttpServletRequest {
 
     @Override
     public Principal getUserPrincipal() {
-        throw new UnsupportedOperationException();
+        return null;
     }
 
     @Override
@@ -168,8 +177,7 @@ public class HttpServletRequestImpl implements HttpServletRequest {
 
     @Override
     public String getServletPath() {
-        throw new UnsupportedOperationException();
-
+        return getRequestURI().replace(getContextPath(), "");
     }
 
     @Override
@@ -268,7 +276,7 @@ public class HttpServletRequestImpl implements HttpServletRequest {
 
     @Override
     public Object getAttribute(String s) {
-        return null;
+        return attrs.get(s);
     }
 
     @Override
@@ -308,7 +316,7 @@ public class HttpServletRequestImpl implements HttpServletRequest {
 
     @Override
     public String getParameter(String s) {
-        return null;
+        return request.getParameter(s);
     }
 
     @Override
@@ -318,7 +326,7 @@ public class HttpServletRequestImpl implements HttpServletRequest {
 
     @Override
     public String[] getParameterValues(String s) {
-        return new String[0];
+        return request.getParameter(s).split(",");
     }
 
     @Override
@@ -363,7 +371,7 @@ public class HttpServletRequestImpl implements HttpServletRequest {
 
     @Override
     public void setAttribute(String s, Object o) {
-
+        attrs.put(s, o);
     }
 
     @Override
@@ -386,9 +394,65 @@ public class HttpServletRequestImpl implements HttpServletRequest {
         return false;
     }
 
+    /**
+     * forward 和 include 调用相对于用户时透明的
+     *
+     * @param s
+     * @return
+     */
     @Override
     public RequestDispatcher getRequestDispatcher(String s) {
-        return null;
+
+        return new RequestDispatcher() {
+
+            /**
+             * request -> servlet1 -> forward -> servlet2 -> response2 -> user
+             *
+             * servlet1 的 response 不会显示给用户
+             *
+             * @param request
+             * @param response
+             * @throws ServletException
+             * @throws IOException
+             */
+            @Override
+            public void forward(ServletRequest request, ServletResponse response) throws ServletException, IOException {
+
+                HttpServletRequest newProxyRequest = (HttpServletRequest) Proxy.newProxyInstance(this.getClass().getClassLoader(),
+                        new Class[]{HttpServletRequest.class}, (proxy, method, args) -> {
+                            String methodName = method.getName();
+                            if (methodName.equals("getRequestURI") || methodName.equals("getPathInfo")) {
+                                return getContextPath() + s;
+                            }
+
+                            if (methodName.equals("getServletPath")) {
+                                return s;
+                            }
+
+                            return method.invoke(request, args);
+                        });
+
+                HttpServlet servlet = container.findServlet(newProxyRequest);
+
+                servlet.service(newProxyRequest, response);
+            }
+
+            /**
+             * request -> servlet1 -> forward -> servlet2 -> response2 -> response1 -> user
+             *
+             * servlet2 的 response 包含在（正在发送给客户端的）servlet1 的 response 包中。
+             *
+             * @param request
+             * @param response
+             * @throws ServletException
+             * @throws IOException
+             */
+            @Override
+            public void include(ServletRequest request, ServletResponse response) throws ServletException, IOException {
+                throw new IllegalStateException("没有实现");
+            }
+
+        };
     }
 
     @Override

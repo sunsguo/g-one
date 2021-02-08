@@ -1,10 +1,13 @@
 package com.gy.servlet;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * 每个 web 应用一个上下文
@@ -45,5 +48,21 @@ public class ApplicationContext {
         uri = uri.substring(contextPath.length());
 
         return servletMappings.get(uri);
+    }
+
+    public void initServlet() {
+        Set<HttpServlet> servlets = new HashSet<>(this.servletMappings.values());
+
+        servlets.forEach(it -> {
+            try {
+                it.init(new ServletConfigImpl());
+            } catch (ServletException e) {
+                e.printStackTrace();
+            }
+        });
+    }
+
+    public HttpServlet findServlet(String path) {
+        return servletMappings.get(path);
     }
 }
