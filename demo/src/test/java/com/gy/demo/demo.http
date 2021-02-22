@@ -1,0 +1,15 @@
+### get test
+GET http://{{host}}:{{port}}/{{context-path}}/hello?name=gy
+Accept: application/json
+Content-Type: application/json
+Agent: unknown
+
+### file upload
+POST http://{{host}}:{{port}}/{{context-path}}/user
+Content-Type: application/json
+
+{
+  "username": "gy",
+  "password": "123456",
+  "age": 21
+}
