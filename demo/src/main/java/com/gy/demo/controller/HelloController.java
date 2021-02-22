@@ -1,5 +1,7 @@
 package com.gy.demo.controller;
 
+import com.gy.demo.vo.User;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -15,6 +17,11 @@ public class HelloController {
     @RequestMapping("hello")
     public String hello(String name) {
         return "hello world: " + name;
+    }
+
+    @RequestMapping("user")
+    public User user(@RequestBody User user) {
+        return user;
     }
 
     @RequestMapping("redirect")
