@@ -12,6 +12,9 @@ repositories {
 dependencies {
     // https://mvnrepository.com/artifact/org.springframework/spring-webmvc
     compile group: 'org.springframework', name: 'spring-webmvc', version: '5.3.3'
+    // https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.12.1'
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.12.1'
 
     compile project(':servlet')
     compile  group: 'javax.servlet', name: 'javax.servlet-api', version: '4.0.1'
