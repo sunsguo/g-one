@@ -65,7 +65,9 @@ public class Response {
         byteBuffer.flip();
         int remaining = byteBuffer.remaining();
 
-        this.headers.add("Content-Length", remaining + "");
+        if (this.headers.getHeader("Content-Length") == null) {
+            this.headers.add("Content-Length", remaining + "");
+        }
 
         try {
             writeHead();
