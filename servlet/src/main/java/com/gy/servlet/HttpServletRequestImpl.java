@@ -9,9 +9,11 @@ import com.gy.server.Response;
 import javax.servlet.*;
 import javax.servlet.http.*;
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Proxy;
+import java.nio.charset.StandardCharsets;
 import java.security.Principal;
 import java.util.*;
 
@@ -307,7 +309,30 @@ public class HttpServletRequestImpl implements HttpServletRequest {
 
     @Override
     public ServletInputStream getInputStream() throws IOException {
-        return null;
+        ByteArrayInputStream inputStream = new ByteArrayInputStream(request.getBody().getBytes(StandardCharsets.UTF_8));
+
+        return new ServletInputStream() {
+            @Override
+            public boolean isFinished() {
+                System.out.println("=============" + inputStream.available());
+                return inputStream.available() <= 0;
+            }
+
+            @Override
+            public boolean isReady() {
+                return true;
+            }
+
+            @Override
+            public void setReadListener(ReadListener readListener) {
+
+            }
+
+            @Override
+            public int read() throws IOException {
+                return inputStream.read();
+            }
+        };
     }
 
     @Override
